@@ -1,0 +1,77 @@
+<html>
+
+<body>
+
+
+<script type = module>
+    import * as THREE from './js/build/three.module.js'
+    import { OrbitControls } from './js/examples/jsm/controls/OrbitControls.js'
+
+    let frameNumber = 0;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+    camera.position.z = 5;
+
+    const renderer = new THREE.WebGLRenderer();
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+
+    const earthGeo = new THREE.SphereGeometry(1, 32, 32);
+    const earthMat = new THREE.MeshPhongMaterial({color: 0x000aff});
+    const earth = new THREE.Mesh(earthGeo, earthMat);
+    scene.add(earth);
+
+    const moonGeo = new THREE.SphereGeometry(0.25, 32, 32);
+    const moonMat = new THREE.MeshPhongMaterial({color: 0xfffadb});
+    const moon = new THREE.Mesh(moonGeo, moonMat);
+    moon.position.x = 1.5;
+    scene.add(moon);
+
+    const sunMat = new THREE.MeshPhongMaterial({emissive: 0xff961f});
+    const sun = new THREE.Mesh(moonGeo, sunMat);
+    scene.add(sun);
+
+    const sunlight = new THREE.PointLight(0xfffdf2);
+    sunlight.position.x = -3;
+    scene.add(sunlight);
+
+    const animate = function () {
+        requestAnimationFrame(animate);
+
+        controls.update();
+
+        let newSunPos = getOrbitPosition("sun", 3);
+        let newMoonPos = getOrbitPosition("moon", 1.5);
+
+        sun.position.set(newSunPos[0], 0, newSunPos[1]);
+        sunlight.position.set(newSunPos[0], 0, newSunPos[1]);
+        moon.position.set(newMoonPos[0], 0, newMoonPos[1]);
+
+        renderer.render(scene, camera);
+        frameNumber++;
+    };
+
+    function getOrbitPosition(objName, a){
+        let multiplier = 1;
+        if (objName == "sun"){
+            multiplier *= -1;
+        }
+
+        let x = a * Math.cos(0.04 * frameNumber) * multiplier;
+        let z = a * Math.sin(0.04 * frameNumber) * multiplier;
+
+        return [x, z];
+    }
+
+    animate();
+</script>
+
+
+</body>
+
+</html>
